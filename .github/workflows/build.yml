@@ -8,6 +8,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Déplier le code de l'application
+        run: |
+          base64 -d app_bundle.b64 > app.tar.gz
+          tar -xzf app.tar.gz
+          rm app_bundle.b64 app.tar.gz
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
