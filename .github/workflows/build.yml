@@ -10,7 +10,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Deplier le code de l application
         run: |
-          python3 -c "import binascii; open('app.tar.gz','wb').write(binascii.unhexlify(open('app_bundle.b64').read().strip()))"
+  python3 -c "import re,binascii; d=re.sub(r'[^0-9a-fA-F]','',open('app_bundle.b64').read()); open('app.tar.gz','wb').write(binascii.unhexlify(d))"
           tar -xzf app.tar.gz
           rm app_bundle.b64 app.tar.gz
       - uses: actions/setup-java@v4
