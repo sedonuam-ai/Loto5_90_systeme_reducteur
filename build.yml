@@ -1,0 +1,43 @@
+name: Build APK
+
+# Se déclenche à chaque envoi sur main, et peut aussi être lancé manuellement
+# depuis l'onglet "Actions" du dépôt GitHub.
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Installer le JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Installer Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Compiler l'APK (debug, installable directement)
+        run: gradle assembleDebug
+
+      - name: Publier l'APK comme artefact téléchargeable
+        uses: actions/upload-artifact@v4
+        with:
+          name: Loto590-debug-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Créer une Release GitHub avec l'APK (uniquement sur main)
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: Loto 5/90 - build ${{ github.run_number }}
+          files: app/build/outputs/apk/debug/app-debug.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
